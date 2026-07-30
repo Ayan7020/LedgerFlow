@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 
 
-from app.core import Config,get_config,lifespan
-from app.core.observability import setup_logger,app_logger,AppInstrumentor
+from app.core import Config,get_config,lifespan,setup_logger,app_logger
+from app.core.observability import Observability
+from app.core.exceptions import register_exception_handlers
 
 def build_app(config: Config):
     app = FastAPI(
@@ -12,13 +13,18 @@ def build_app(config: Config):
     return app 
 
 config = get_config() 
-setup_logger(config.is_prod)
-
-
 app = build_app(config)
-AppInstrumentor(app)
+register_exception_handlers(app,app_logger)
+if(True):
+    obs = Observability(config.app_name,config.better_stack_host,config.better_stack_source_token)
+    obs.setup()
+    setup_logger(True,obs.get_logging_handler())
+    obs.instrument(app)
+else:
+    setup_logger()
 
-@app.get("/HOME")
-async def HOME():
-    app_logger.info("HOME ROUTE")
-    return None
+
+
+@app.get("/test")
+async def Test():
+    raise RuntimeError("Database is completely unavailable")

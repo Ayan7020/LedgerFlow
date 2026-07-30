@@ -15,6 +15,9 @@ class Config(BaseSettings):
 
     env: Literal["prod","dev","test"] = "dev"
 
+    better_stack_source_token: str 
+    better_stack_host: str
+
     @property
     def is_prod(self) -> bool:
         return self.env == "prod"
