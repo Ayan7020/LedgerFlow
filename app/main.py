@@ -15,16 +15,11 @@ def build_app(config: Config):
 config = get_config() 
 app = build_app(config)
 register_exception_handlers(app,app_logger)
-if(True):
+if(config.is_prod):
     obs = Observability(config.app_name,config.better_stack_host,config.better_stack_source_token)
     obs.setup()
-    setup_logger(True,obs.get_logging_handler())
     obs.instrument(app)
+
+    setup_logger(True,obs.get_logging_handler())
 else:
     setup_logger()
-
-
-
-@app.get("/test")
-async def Test():
-    raise RuntimeError("Database is completely unavailable")

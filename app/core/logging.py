@@ -51,12 +51,11 @@ def setup_logger(is_prod: bool = False,obs_handler = None):
             obs_logger.setLevel(logging.INFO)
 
             def obs_sink(message):  
-
                 record = message.record 
-                print("RECORD: ",record)
-                # obs_logger.log(
-                #     level=record["level"].no,
-                #     msg=record["message"]
-                # )
+                obs_logger.log(
+                    level=record["level"].no,
+                    exc_info=record["exception"],
+                    msg=record["message"]
+                )
             logger.add(obs_sink)
      
