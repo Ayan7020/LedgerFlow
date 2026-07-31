@@ -1,0 +1,25 @@
+services:
+  postgres-ledgerflow:
+    image: postgres:17
+    container_name: postgres_ledgerflow
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: ${db_username}
+      POSTGRES_PASSWORD: ${db_password}
+      POSTGRES_DB: ${db_name}
+
+    ports:
+      - "5439:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

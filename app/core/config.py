@@ -18,6 +18,15 @@ class Config(BaseSettings):
     better_stack_source_token: str 
     better_stack_host: str
 
+    db_username: str | None = None
+    db_password: str | None = None
+    db_host: str | None = None
+    db_port: int | None = None
+    db_name: str | None = None
+
+
+    GOOGLE_CLIENT_ID: str
+
     @property
     def is_prod(self) -> bool:
         return self.env == "prod"

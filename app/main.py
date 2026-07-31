@@ -1,25 +1,35 @@
+from typing import Optional
+
 from fastapi import FastAPI
 
-
-from app.core import Config,get_config,lifespan,setup_logger,app_logger
+from app.core import get_config, lifespan, setup_logger, app_logger
 from app.core.observability import Observability
 from app.core.exceptions import register_exception_handlers
+from app.api.v1 import V1Router
 
-def build_app(config: Config):
-    app = FastAPI(
-        title=config.app_name,
-        lifespan=lifespan
-    )
-    return app 
+def create_app() -> FastAPI: 
+    config = get_config()
 
-config = get_config() 
-app = build_app(config)
-register_exception_handlers(app,app_logger)
-if(config.is_prod):
-    obs = Observability(config.app_name,config.better_stack_host,config.better_stack_source_token)
-    obs.setup()
-    obs.instrument(app)
+    obs: Optional[Observability] = None
 
-    setup_logger(True,obs.get_logging_handler())
-else:
-    setup_logger()
+     
+    if config.is_prod:
+        obs = Observability(config.app_name, config.better_stack_host, config.better_stack_source_token)
+        obs.setup()
+        setup_logger(is_prod=True, obs_handler=obs.get_logging_handler())
+    else:
+        setup_logger()
+
+    app = FastAPI(title=config.app_name, lifespan=lifespan)
+ 
+    register_exception_handlers(app, app_logger)
+
+    if obs is not None:
+        obs.instrument(app)
+
+    app.include_router(V1Router)
+
+    return app
+
+
+app = create_app()
