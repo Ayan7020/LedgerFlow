@@ -31,7 +31,7 @@ class Config(BaseSettings):
 
     @property
     def is_prod(self) -> bool:
-        return self.env == "dev"
+        return self.env == "prod"
 
     @property
     def is_test(self) -> bool:
