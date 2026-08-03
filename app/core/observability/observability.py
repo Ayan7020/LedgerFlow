@@ -6,7 +6,8 @@ from .telemetry import (
 )
 
 from .instrumentors import (
-    instrument_fastapi
+    instrument_fastapi,
+    instrument_sqlalchemy
 )
 
 class Observability:
@@ -23,5 +24,6 @@ class Observability:
     def get_logging_handler(self):  
         return self.__loging_handler
     
-    def instrument(self,app):
+    def instrument(self,app,engine):
         instrument_fastapi(app=app)
+        instrument_sqlalchemy(engine=engine)

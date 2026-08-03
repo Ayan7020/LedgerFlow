@@ -13,7 +13,7 @@ def init_db(
     db_port: int,
     db_name: str,
     *,
-    echo: bool = False,
+    echo: bool = True,
     pool_size: int = 10,
     max_overflow: int = 20,
     pool_timeout: int = 30,

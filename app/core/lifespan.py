@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager 
+from app.db import init_db,dispose_db
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):  
@@ -8,15 +9,15 @@ async def lifespan(app: FastAPI):
 
     config = get_config()
 
-    # if config.db_username and config.db_password and config.db_host and config.db_port and config.db_name:
-    #     init_db(
-    #         db_username=config.db_username,
-    #         db_password=config.db_password,
-    #         db_host=config.db_host,
-    #         db_port=config.db_port,
-    #         db_name=config.db_name
-    #     )
+    if config.db_username and config.db_password and config.db_host and config.db_port and config.db_name:
+        init_db(
+            db_username=config.db_username,
+            db_password=config.db_password,
+            db_host=config.db_host,
+            db_port=config.db_port,
+            db_name=config.db_name
+        )
 
     yield
  
-    # await dispose_db()
+    await dispose_db()

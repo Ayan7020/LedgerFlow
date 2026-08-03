@@ -1,0 +1,13 @@
+from typing import Protocol
+
+from app.models.db import User
+
+
+class IUserRepository(Protocol):
+    async def get_by_google_sub(self, sub: str) -> User | None: ...
+
+    async def get_by_email(self, email: str) -> User | None: ...
+
+    async def get_by_username(self, username: str) -> User | None: ...
+
+    async def create(self, data: User) -> User: ...

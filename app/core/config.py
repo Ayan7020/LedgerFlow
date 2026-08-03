@@ -26,10 +26,12 @@ class Config(BaseSettings):
 
 
     GOOGLE_CLIENT_ID: str
+    
+    SECRET_KEY: str
 
     @property
     def is_prod(self) -> bool:
-        return self.env == "prod"
+        return self.env == "dev"
 
     @property
     def is_test(self) -> bool:
