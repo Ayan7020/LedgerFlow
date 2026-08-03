@@ -179,4 +179,3 @@ LedgerFlow/
 - **Environment**: Set `env=dev` for local development. Production mode (`env=prod`) enables Better Stack logging and OpenTelemetry instrumentation.
 - **Database port**: The Compose file maps host port `5439` to container port `5432`. Keep `db_port=5439` in `.env` when connecting from the host.
 - **Refresh token cookie**: In development, the refresh token cookie is set with `secure=False`. Use HTTPS and `secure=True` in production deployments.
-

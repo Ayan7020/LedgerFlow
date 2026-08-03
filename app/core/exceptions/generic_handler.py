@@ -8,6 +8,7 @@ def register_generic_handlers(app: FastAPI,logger: Logger):
 
     @app.exception_handler(AppException)
     async def app_exception_handler(request: Request,exc: AppException):
+        logger.opt(exception=exc).warning("App Exception")
         return JSONResponse(
             status_code=exc.status_code,
             content={
@@ -25,6 +26,6 @@ def register_generic_handlers(app: FastAPI,logger: Logger):
             content={
                 "success": False,
                 "message": "Internal Server Error",
-                "data": None,
+                "data": {},
             },
         )
