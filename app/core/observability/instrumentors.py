@@ -8,5 +8,5 @@ def instrument_fastapi(app: FastAPI):
 
 
 def instrument_sqlalchemy(engine: AsyncEngine):
-    from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor 
-    return SQLAlchemyInstrumentor().instrument(engine=engine.sync_engine)
+    from opentelemetry.instrumentation.asyncpg import AsyncPGInstrumentor 
+    return AsyncPGInstrumentor().instrument()

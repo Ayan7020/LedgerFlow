@@ -9,6 +9,7 @@ from app.api.v1 import V1Router
 
 def create_app() -> FastAPI: 
     config = get_config()
+    print(config.env)
 
     obs: Optional[Observability] = None
 

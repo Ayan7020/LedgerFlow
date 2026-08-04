@@ -21,7 +21,7 @@ class User(Base):
 
     userName: Mapped[str] = mapped_column(
         String(60),
-        unique=True,
+        unique=False,
     )
 
     google_sub: Mapped[str | None] = mapped_column(

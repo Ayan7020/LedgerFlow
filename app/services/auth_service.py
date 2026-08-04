@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta, timezone
-import re
 
 from google.oauth2 import id_token
 from google.auth.transport import requests
@@ -29,25 +28,32 @@ class AuthService:
         self.__secret_key = secret_key
 
     async def auth_google(self, token: str) -> AuthTokensResult:
+        app_logger.info("Google auth started")
+
         id_info = self._verify_google_token(token)
 
         email = id_info.get("email")
         google_sub = id_info.get("sub")
 
         if not email or not google_sub:
+            app_logger.warning("Google auth rejected: token missing required claims")
             raise BadRequestException("Google token missing required claims")
 
         if not id_info.get("email_verified", False):
+            app_logger.warning(
+                "Google auth rejected: email not verified google_sub={}",
+                google_sub,
+            )
             raise UnauthorizedException("Google email is not verified")
+
+        app_logger.info("Google token verified google_sub={}", google_sub)
 
         user = await self._get_or_create_user(
             email,
             google_sub,
             id_info.get("name"),
-        ) 
-        
-        print("USER: ",user)
-        
+        )
+
         access_token = create_access_token(
             user_id=user.id,
             access_token_expire_minutes=ACCESS_TOKEN_EXPIRES_MINUTES,
@@ -58,7 +64,7 @@ class AuthService:
             refresh_token_expire_days=REFRESH_TOKEN_EXPIRES_DAYS,
             key=self.__secret_key,
         )
- 
+
         refresh_token_obj = RefreshToken(
             user_id=user.id,
             token_hash=hash_token(raw_refresh_token),
@@ -67,8 +73,9 @@ class AuthService:
         )
 
         await self._refresh_token_repo.create(data=refresh_token_obj)
-        print("BEFORE COMMTING")
         await self.__session.commit()
+
+        app_logger.info("Google auth completed user_id={}", user.id)
 
         return AuthTokensResult(
             access_token=access_token,
@@ -83,19 +90,27 @@ class AuthService:
     ) -> User:
         user = await self._user_repo.get_by_google_sub(google_sub)
         if user:
+            app_logger.info(
+                "Existing user resolved user_id={} google_sub={}",
+                user.id,
+                google_sub,
+            )
             return user
 
-
-        user_name = self._derive_username(email, name) 
-        return await self._user_repo.create(
+        user_name = self._derive_username(email, name)
+        user = await self._user_repo.create(
             data=User(
                 email=email,
                 userName=user_name,
                 google_sub=google_sub,
             )
         )
-
-     
+        app_logger.info(
+            "New user created user_id={} google_sub={}",
+            user.id,
+            google_sub,
+        )
+        return user
 
     def _derive_username(self, email: str, name: str | None) -> str:
         if not email:
@@ -119,4 +134,5 @@ class AuthService:
                 self._GOOGLE_CLIENT_ID,
             )
         except ValueError:
+            app_logger.warning("Google auth rejected: invalid or expired token")
             raise UnauthorizedException("Invalid or expired Google token") from None

@@ -9,7 +9,8 @@ from app.repositories import (
 )
 
 from app.services import (
-    AuthService
+    AuthService,
+    UserService
 )
 from app.core import (
     get_config,
@@ -28,4 +29,11 @@ def get_auth_service(
         Session=session,
         User_repo=UserSQlAlchemyRepository(session=session),
         Refresh_token_repo=TokenSqlAlchemyRepository(session=session),
+    )
+
+def get_user_service(
+    session: AsyncSession = Depends(get_async_db_session)
+):
+    return UserService(
+        user_repo=UserSQlAlchemyRepository(session=session)
     )
