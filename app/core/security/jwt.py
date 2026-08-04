@@ -1,6 +1,9 @@
+  
 import jwt
 from datetime import datetime, timedelta, timezone
-from uuid import UUID
+from uuid import UUID 
+
+
 
 ALGORITHM = "HS256"
 
@@ -50,3 +53,12 @@ def create_refresh_token(
         algorithm=ALGORITHM,
         key=key,
     )
+
+
+def verify_access_token(token: str,key: str): 
+    payload = jwt.decode(
+        jwt=token,
+        key=key,
+        algorithms=[ALGORITHM]
+    )
+    return payload

@@ -29,7 +29,7 @@ def register_sqlalchemy_handlers(app: FastAPI, logger: Logger):
         status_code, message = _map_sqlalchemy_error(exc)
 
         if status_code >= 500:
-            logger.opt(exception=exc).error("SQLAlchemy error")
+            logger.opt(exception=exc).critical("SQLAlchemy error")
         else:
             logger.opt(exception=exc).warning("SQLAlchemy error")
 

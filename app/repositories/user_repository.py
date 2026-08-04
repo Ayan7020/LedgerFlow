@@ -1,5 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.models.db import User
 
@@ -25,6 +26,13 @@ class UserSQlAlchemyRepository:
             select(User).where(User.userName == username)
         )
         return result.scalar_one_or_none()
+    
+    async def get_by_user_id(self,user_id: str) -> User | None: 
+        result = await self.__session.execute(
+            select(User).where(User.id == user_id)
+        )  
+        user = result.scalar_one_or_none()  
+        return user
 
     async def create(self, data: User) -> User: 
         self.__session.add(data) 

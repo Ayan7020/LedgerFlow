@@ -8,9 +8,8 @@ class UserService:
         ):
         self.__user_repo = user_repo
 
-    async def get_me(self,user_id: str):
-        user = await self.__user_repo.get_by_google_sub(user_id)
+    async def get_me(self,user_id: str):  
+        user = await self.__user_repo.get_by_user_id(user_id)
         if user == None:
-            raise UnauthorizedException()
-
+            raise UnauthorizedException()  
         return user

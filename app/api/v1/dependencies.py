@@ -1,6 +1,9 @@
 from fastapi import Depends
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
+from jwt import DecodeError, ExpiredSignatureError, InvalidSignatureError
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.core.exceptions import UnauthorizedException
 from app.db.session import get_async_db_session
 
 from app.repositories import (
@@ -13,10 +16,41 @@ from app.services import (
     UserService
 )
 from app.core import (
+    app_logger,
     get_config,
     Config
 )
 
+from app.core.security import (
+    verify_access_token
+)
+
+oauth2_scheme = HTTPBearer()
+
+def get_current_user(
+    config: Config = Depends(get_config),
+    credentials: HTTPAuthorizationCredentials  = Depends(oauth2_scheme)
+):  
+    try: 
+        payload = verify_access_token(credentials.credentials,config.SECRET_KEY)
+        user_id = payload.get("sub")
+        if user_id is None:
+            pass  
+        return str(user_id)
+    
+    except ExpiredSignatureError:
+        app_logger.warning("JWT has expired")
+        raise UnauthorizedException("Invalid Jwt Token")
+
+    except InvalidSignatureError:
+        app_logger.warning("JWT signature is invalid")
+        raise UnauthorizedException("Invalid Jwt Token")
+
+    except DecodeError as exc: 
+        app_logger.opt(exception=exc).critical("Malformed JWT") 
+        raise UnauthorizedException("Invalid Jwt Token")
+    
+    
 
 
 def get_auth_service(
