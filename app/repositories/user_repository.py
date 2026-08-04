@@ -26,10 +26,8 @@ class UserSQlAlchemyRepository:
         )
         return result.scalar_one_or_none()
 
-    async def create(self, data: User) -> User:
-        print("BEFORE: ",data)
-        self.__session.add(data)
-        print("DATA: ",data)
+    async def create(self, data: User) -> User: 
+        self.__session.add(data) 
         # await self.__session.flush()
         # await self.__session.refresh(data) 
         return data
