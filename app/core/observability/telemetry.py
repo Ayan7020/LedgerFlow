@@ -10,6 +10,8 @@ from opentelemetry.sdk._logs import LoggerProvider,LoggingHandler
 from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
 from opentelemetry.exporter.otlp.proto.http._log_exporter import OTLPLogExporter 
 
+from .span_filter import FilteringSpanProcessor 
+
 def create_resource(resource_name: str) -> Resource:
     return Resource.create({
         "service.name": resource_name,
@@ -24,9 +26,9 @@ def setup_tracer_provider(resource: Resource,host: str,token: str):
             "Authorization": f"Bearer {token}"
         }
     )
-
+    span_processor = BatchSpanProcessor(exporter) 
     provider.add_span_processor(
-        BatchSpanProcessor(exporter)
+        FilteringSpanProcessor(next_processor=span_processor,keep_tx_slower_than_ms=50)
     )
 
     trace.set_tracer_provider(provider)

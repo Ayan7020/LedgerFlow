@@ -6,6 +6,7 @@ from google.auth.transport import requests
 from app.core import ACCESS_TOKEN_EXPIRES_MINUTES, REFRESH_TOKEN_EXPIRES_DAYS, app_logger
 from app.core.exceptions import UnauthorizedException, BadRequestException
 from app.core.security import hash_token, create_access_token, create_refresh_token
+from app.core.observability import tracing
 
 from app.models.Interfaces import IUserRepository, IRefreshTokenRepository, IAsyncSession
 from app.models.db import RefreshToken, User
@@ -27,6 +28,7 @@ class AuthService:
         self.__session = Session
         self.__secret_key = secret_key
 
+    @tracing("AuthService.auth_google")
     async def auth_google(self, token: str) -> AuthTokensResult:
         app_logger.info("Google auth started")
 
@@ -81,7 +83,8 @@ class AuthService:
             access_token=access_token,
             refresh_token=raw_refresh_token,
         )
-
+    
+    @tracing("AuthService._get_or_create_user")
     async def _get_or_create_user(
         self,
         email: str,
@@ -125,7 +128,8 @@ class AuthService:
             raise ValueError("Could not derive a valid username.")
 
         return username
-
+    
+    @tracing("AuthService._verify_google_token")
     def _verify_google_token(self, token: str) -> dict:
         try:
             return id_token.verify_oauth2_token(
