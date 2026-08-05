@@ -83,7 +83,33 @@ class AuthService:
             access_token=access_token,
             refresh_token=raw_refresh_token,
         )
-    
+
+    @tracing("AuthService.refresh_access_token")
+    async def refresh_access_token(self,refresh_token: str) -> AuthTokensResult:
+        app_logger.info("Refresh Access Token started")
+
+        token_hash = hash_token(refresh_token)
+        existing_refresh_token = await self._refresh_token_repo.get_by_token(token_hash)
+
+        if existing_refresh_token is None:
+            app_logger.warning("Refresh Token not found in the repo")
+            raise BadRequestException("Invalid Token!")
+
+        if existing_refresh_token.revoked_at or existing_refresh_token.expires_at < datetime.now(timezone.utc):
+            app_logger.warning("Token revoked or expired for user_id={}",existing_refresh_token.user_id)
+            raise UnauthorizedException("Token revoked or expired")
+
+        
+        access_token = create_access_token(
+            user_id=existing_refresh_token.user_id,
+            access_token_expire_minutes=ACCESS_TOKEN_EXPIRES_MINUTES,
+            key=self.__secret_key,
+        )
+
+        app_logger.info("Refresh Access Token Completed for user_id={}",existing_refresh_token.user_id)
+        return AuthTokensResult(access_token=access_token,refresh_token=refresh_token)
+        
+
     @tracing("AuthService._get_or_create_user")
     async def _get_or_create_user(
         self,

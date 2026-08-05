@@ -11,5 +11,5 @@ class UserService:
     async def get_me(self,user_id: str):  
         user = await self.__user_repo.get_by_user_id(user_id)
         if user == None:
-            raise UnauthorizedException()  
+            raise UnauthorizedException("User not found")  
         return user

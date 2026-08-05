@@ -1,8 +1,9 @@
-from fastapi import APIRouter,Depends,Response
+from fastapi import APIRouter,Depends,Response,Request
 from app.core import REFRESH_COOKIE_MAX_AGE
 from .dependencies import (
     get_auth_service
 )
+from app.core.exceptions import BadRequestException
 
 from app.services import AuthService
 
@@ -24,5 +25,19 @@ async def google_auth(token: str,response: Response,service: AuthService = Depen
     return {
         "success": True,
         "message": "Authenticated",
+        "data": {"access_token": result.access_token, "token_type": "bearer"},
+    }
+
+@auth_router.get("/refresh-access-token")
+async def refresh_access_token(request: Request,service: AuthService = Depends(get_auth_service)):
+    refresh_token = request.cookies.get("refresh_token",None)
+    if not refresh_token:
+        BadRequestException("Please provide the refresh token")
+
+    result = await service.refresh_access_token(refresh_token)
+
+    return {
+        "success": True,
+        "message": "",
         "data": {"access_token": result.access_token, "token_type": "bearer"},
     }
