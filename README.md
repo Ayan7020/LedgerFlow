@@ -173,6 +173,8 @@ LedgerFlow/
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/api/v1/auth/google` | Authenticate with a Google OAuth token; returns a JWT access token and sets a refresh token cookie |
+| `GET` | `/api/v1/auth/refresh-access-token` | Exchange the `refresh` token (stored in a secure cookie) for a new JWT access token |
+| `GET` | `/api/v1/user/me` | Return the current authenticated user's profile (requires `Authorization: Bearer <access_token>`) |
 
 ## Development Notes
 
