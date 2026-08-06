@@ -6,12 +6,13 @@ from .dependencies import (
 from app.core.exceptions import BadRequestException
 
 from app.services import AuthService
+from app.models.http import AuthGoogleRequest
 
 auth_router = APIRouter(prefix="/auth",tags=["Auth"])
 
 @auth_router.post("/google")
-async def google_auth(token: str,response: Response,service: AuthService = Depends(get_auth_service)):
-    result = await service.auth_google(token)
+async def google_auth(body: AuthGoogleRequest,response: Response,service: AuthService = Depends(get_auth_service)):
+    result = await service.auth_google(body.token)
     
     response.set_cookie(
         key="refresh_token",
