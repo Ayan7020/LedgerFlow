@@ -1,6 +1,7 @@
 from typing import Optional
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.core import get_config, lifespan, setup_logger, app_logger
 from app.core.observability import Observability
@@ -8,8 +9,7 @@ from app.core.exceptions import register_exception_handlers
 from app.api.v1 import V1Router
 
 def create_app() -> FastAPI: 
-    config = get_config()
-    print(config.env)
+    config = get_config() 
 
     obs: Optional[Observability] = None
 
@@ -22,6 +22,17 @@ def create_app() -> FastAPI:
         setup_logger()
 
     app = FastAPI(title=config.app_name, lifespan=lifespan)
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[
+            "http://localhost:3000",
+            "http:localhost:5173"
+        ],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     register_exception_handlers(app, app_logger) 
 
     if config.db_username and config.db_password and config.db_host and config.db_port and config.db_name:
@@ -38,7 +49,7 @@ def create_app() -> FastAPI:
             obs.instrument(app, get_engine())
 
     app.include_router(V1Router)
-
+    
     return app
 
 
