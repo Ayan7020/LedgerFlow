@@ -2,23 +2,30 @@
 import jwt
 from datetime import datetime, timedelta, timezone
 from uuid import UUID 
+import secrets
 
 
 
 ALGORITHM = "HS256"
 
+def _generate_randomns():
+    return secrets.token_urlsafe(64)
 
 def _create_token(
-    user_id: UUID | str,
+    user_id: UUID | str | None,
     token_type: str,
     expires_delta: timedelta,
     key: str,
     algorithm: str,
 ) -> str:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(timezone.utc) 
+    if user_id:
+        sub = str(user_id)
+    else:
+        sub = _generate_randomns()
 
     payload = {
-        "sub": str(user_id),
+        "sub": sub,
         "type": token_type,
         "iat": now,
         "exp": now + expires_delta,
@@ -47,7 +54,7 @@ def create_refresh_token(
     key: str,
 ) -> str:
     return _create_token(
-        user_id=user_id,
+        user_id=None,
         token_type="refresh",
         expires_delta=timedelta(days=refresh_token_expire_days),
         algorithm=ALGORITHM,

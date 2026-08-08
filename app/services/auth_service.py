@@ -67,6 +67,8 @@ class AuthService:
             key=self.__secret_key,
         )
 
+        app_logger.info("Raw Refresh_Token: {}",raw_refresh_token)
+
         refresh_token_obj = RefreshToken(
             user_id=user.id,
             token_hash=hash_token(raw_refresh_token),
