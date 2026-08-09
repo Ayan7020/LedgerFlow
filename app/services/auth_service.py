@@ -82,6 +82,7 @@ class AuthService:
         app_logger.info("Google auth completed user_id={}", user.id)
 
         return AuthTokensResult(
+            id=user.id,
             access_token=access_token,
             refresh_token=raw_refresh_token,
         )

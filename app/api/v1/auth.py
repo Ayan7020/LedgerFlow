@@ -1,5 +1,5 @@
 from fastapi import APIRouter,Depends,Response,Request
-from app.core import REFRESH_COOKIE_MAX_AGE
+from app.core import REFRESH_COOKIE_MAX_AGE,ACCESS_TOKEN_EXPIRES_SECONDS
 from .dependencies import (
     get_auth_service
 )
@@ -22,23 +22,41 @@ async def google_auth(body: AuthGoogleRequest,response: Response,service: AuthSe
         samesite="lax",       
         max_age=REFRESH_COOKIE_MAX_AGE,           
     )
+
+    response.set_cookie(
+        key="access_token",
+        value=result.access_token,
+        httponly=True,
+        secure=False,          
+        samesite="lax",       
+        max_age=ACCESS_TOKEN_EXPIRES_SECONDS,           
+    )
     
     return {
         "success": True,
         "message": "Authenticated",
-        "data": {"access_token": result.access_token, "token_type": "bearer"},
+        "data": { "_id": result.id },
     }
 
 @auth_router.get("/refresh-access-token")
-async def refresh_access_token(request: Request,service: AuthService = Depends(get_auth_service)):
+async def refresh_access_token(request: Request,response: Response,service: AuthService = Depends(get_auth_service)):
     refresh_token = request.cookies.get("refresh_token",None)
     if not refresh_token:
         BadRequestException("Please provide the refresh token")
 
     result = await service.refresh_access_token(refresh_token)
 
+    response.set_cookie(
+        key="access_token",
+        value=result.access_token,
+        httponly=True,
+        secure=False,          
+        samesite="lax",       
+        max_age=ACCESS_TOKEN_EXPIRES_SECONDS,           
+    )
+
     return {
         "success": True,
         "message": "",
-        "data": {"access_token": result.access_token, "token_type": "bearer"},
+        "data": { },
     }
