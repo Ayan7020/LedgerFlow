@@ -1,8 +1,9 @@
-from fastapi import Depends,Cookie 
+from fastapi import Depends
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from jwt import DecodeError, ExpiredSignatureError, InvalidSignatureError
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.core.exceptions import UnauthorizedException,BadRequestException
+from app.core.exceptions import UnauthorizedException
 from app.db.session import get_async_db_session
 
 from app.repositories import (
@@ -23,18 +24,15 @@ from app.core import (
 from app.core.security import (
     verify_access_token
 )
- 
+
+oauth2_scheme = HTTPBearer()
 
 def get_current_user(
     config: Config = Depends(get_config),
-    access_token: str | None = Cookie(default=None)
+    credentials: HTTPAuthorizationCredentials  = Depends(oauth2_scheme)
 ):  
     try: 
-        if not access_token:
-            app_logger.warning("access_token not found")
-            raise BadRequestException("Invalid request")
-        
-        payload = verify_access_token(access_token,config.SECRET_KEY)
+        payload = verify_access_token(credentials.credentials,config.SECRET_KEY)
         user_id = payload.get("sub")
         if user_id is None:
             pass  
