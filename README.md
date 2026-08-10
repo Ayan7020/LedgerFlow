@@ -69,6 +69,8 @@ db_password="<db-password>"
 db_name="ledgerflow_dev"
 db_host="localhost"
 db_port=5439
+
+allow_origins=["http://localhost:8000","http://localhost:5173"]
 ```
 
 | Variable | Description |
@@ -83,6 +85,7 @@ db_port=5439
 | `db_name` | PostgreSQL database name |
 | `db_host` | Database host (`localhost` when using Docker Compose locally) |
 | `db_port` | Database port (`5439` maps to the Compose service) |
+| `allow_origins` | Application config for setting up origins allow for the api (["http://localhost:8000"] or where your frontend is present)|
 
 Do not commit `.env` to version control. It is listed in `.gitignore`.
 
