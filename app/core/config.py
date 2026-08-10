@@ -1,3 +1,4 @@
+from pydantic import field_validator
 from pydantic_settings import BaseSettings,SettingsConfigDict
 from functools import lru_cache
 from typing import Literal
@@ -24,10 +25,13 @@ class Config(BaseSettings):
     db_port: int | None = None
     db_name: str | None = None
 
+    allow_origins: list[str] = []
+
 
     GOOGLE_CLIENT_ID: str
     
     SECRET_KEY: str
+ 
 
     @property
     def is_prod(self) -> bool:
