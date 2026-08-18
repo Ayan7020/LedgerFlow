@@ -17,7 +17,7 @@ async def google_auth(body: AuthGoogleRequest,response: Response,service: AuthSe
     return {
         "success": True,
         "message": "Authenticated",
-        "data": { "_id": result.id,"access_token": result.access_token,"refresh_token": result.refresh_token },
+        "data": { "access_token": result.access_token,"refresh_token": result.refresh_token },
     }
 
 @auth_router.get("/refresh-access-token")
