@@ -13,8 +13,11 @@ class UserService:
 
     @tracing("UserService.get_me")
     async def get_me(self,user_id: str):  
+        app_logger.info("Fetching user get started")
         user = await self.__user_repo.get_by_user_id(user_id)
         if user == None:
             app_logger.warning("User not found")
-            raise UnauthorizedException("User not found")  
+            raise UnauthorizedException("User not found")
+
+        app_logger.info("Fetching user finished")  
         return user

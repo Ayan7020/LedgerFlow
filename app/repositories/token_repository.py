@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select,delete 
 
 from app.models.db import RefreshToken
 
@@ -19,3 +19,9 @@ class TokenSqlAlchemyRepository:
             select(RefreshToken).where(RefreshToken.token_hash == token_hash)
         )
         return result.scalar_one_or_none()
+
+    async def remove_token(self,token_hash: str) -> int: 
+        result =  await self.__session.execute(
+            delete(RefreshToken).where(RefreshToken.token_hash == token_hash)
+        )  
+        return result.rowcount or 0

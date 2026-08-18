@@ -111,6 +111,15 @@ class AuthService:
         app_logger.info("Refresh Access Token Completed for user_id={}",existing_refresh_token.user_id)
         return AuthTokensResult(access_token=access_token,refresh_token=refresh_token)
         
+    @tracing("Authservice.logout")
+    async def logout(self,refresh_token: str) -> None:
+        app_logger.info("Logout started")
+
+        rows_deleted = await self._user_repo.remove_token(refresh_token) 
+        app_logger.info("Rows deleted={}",rows_deleted)
+        
+        app_logger.info("Logout finished")
+        return None
 
     @tracing("AuthService._get_or_create_user")
     async def _get_or_create_user(

@@ -1,5 +1,4 @@
-from fastapi import APIRouter,Depends,Response,Request
-from app.core import REFRESH_COOKIE_MAX_AGE,ACCESS_TOKEN_EXPIRES_SECONDS
+from fastapi import APIRouter,Depends,Response,Request 
 from .dependencies import (
     get_auth_service
 )
@@ -34,4 +33,18 @@ async def refresh_access_token(request: Request,response: Response,service: Auth
         "data": { 
             "access_token": result.access_token
         },
+    }
+
+@auth_router.post("/logout")
+async def logout_user(request: Request,response: Response,service: AuthService = Depends(get_auth_service)):
+    refresh_token = request.cookies.get("refresh_token",None)
+    if not refresh_token:
+        BadRequestException("Please provide the refresh token")
+
+    await service.logout(refresh_token)
+
+    return {
+        "success": True,
+        "message": "Processed successfully",
+        "data": {}
     }
