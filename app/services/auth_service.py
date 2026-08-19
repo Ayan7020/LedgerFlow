@@ -115,7 +115,7 @@ class AuthService:
     async def logout(self,refresh_token: str) -> None:
         app_logger.info("Logout started")
 
-        rows_deleted = await self._user_repo.remove_token(refresh_token) 
+        rows_deleted = await self._refresh_token_repo.remove_token(refresh_token) 
         app_logger.info("Rows deleted={}",rows_deleted)
         
         app_logger.info("Logout finished")
