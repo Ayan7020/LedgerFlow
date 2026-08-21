@@ -8,12 +8,14 @@ from app.db.session import get_async_db_session
 
 from app.repositories import (
     TokenSqlAlchemyRepository,
-    UserSQlAlchemyRepository   
+    UserSQlAlchemyRepository,
+    DealerSqlAlchemyRepository 
 )
 
 from app.services import (
     AuthService,
-    UserService
+    UserService,
+    DealerService
 )
 from app.core import (
     app_logger,
@@ -54,7 +56,6 @@ def get_current_user(
     
     
 
-
 def get_auth_service(
     config: Config = Depends(get_config),
     session: AsyncSession = Depends(get_async_db_session)
@@ -72,4 +73,12 @@ def get_user_service(
 ):
     return UserService(
         user_repo=UserSQlAlchemyRepository(session=session)
+    )
+
+def get_dealer_service(
+    session: AsyncSession = Depends(get_async_db_session)
+):
+    return DealerService(
+        repo=DealerSqlAlchemyRepository(session=session),
+        Session=session
     )
