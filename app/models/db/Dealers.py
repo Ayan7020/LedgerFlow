@@ -4,7 +4,7 @@ from app.db import Base
 from app.utils import UNIQUE_ID_TYPE,get_unique_id
 
 from sqlalchemy.orm import Mapped,mapped_column,relationship
-from sqlalchemy import Uuid,String,DateTime
+from sqlalchemy import Uuid,String,DateTime,ForeignKey
 
 from typing import TYPE_CHECKING
 
@@ -14,6 +14,11 @@ if TYPE_CHECKING:
 class Dealers(Base):
     __tablename__="dealers"
 
+    user_id: Mapped[UNIQUE_ID_TYPE] = mapped_column(
+        Uuid,
+        ForeignKey("users.id", ondelete="CASCADE")
+    )
+    
     name:str = mapped_column(
         String(255),
     )
