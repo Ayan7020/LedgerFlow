@@ -1,5 +1,5 @@
-from fastapi import Depends,Cookie
-from fastapi.security import HTTPAuthorizationCredentials
+from fastapi import Depends,Request,Security
+from fastapi.security import APIKeyHeader
 
 from jwt import DecodeError, ExpiredSignatureError, InvalidSignatureError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -27,12 +27,18 @@ from app.core.security import (
     verify_access_token
 )
 
+access_token_header = APIKeyHeader(
+    name="access_token",
+    auto_error=False,
+)
 
 def get_current_user(
+    req: Request, 
     config: Config = Depends(get_config),
-    access_token: str | None  = Cookie(default= None)
+    access_token_header: str | None = Security(access_token_header),
 ):  
     try: 
+        access_token = req.cookies.get("access_token") or access_token_header
         if not access_token:
             raise BadRequestException("Access token missing")
         
