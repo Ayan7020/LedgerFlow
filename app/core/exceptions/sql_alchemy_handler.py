@@ -13,6 +13,7 @@ from sqlalchemy.exc import (
 
 def _map_sqlalchemy_error(exc: SQLAlchemyError) -> tuple[int, str]:
     if isinstance(exc, IntegrityError):
+        print("Message:", repr(exc.orig))
         return 409, "Integrity constraint violation"
     if isinstance(exc, NoResultFound):
         return 404, "Resource not found"
