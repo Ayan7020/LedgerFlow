@@ -177,10 +177,13 @@ LedgerFlow/
 |--------|----------|-------------|
 | `POST` | `/api/v1/auth/google` | Authenticate with a Google OAuth token; returns a JWT access token and sets a refresh token cookie |
 | `GET` | `/api/v1/auth/refresh-access-token` | Exchange the `refresh` token (stored in a secure cookie) for a new JWT access token |
-| `GET` | `/api/v1/user/me` | Return the current authenticated user's profile (requires `Authorization: Bearer <access_token>`) |
+| `POST` | `/api/v1/auth/logout` | Logout the current user  |
+| `GET` | `/api/v1/user/me` | Return the current authenticated user's profile  |
+| `POST` | `/api/v1/dealer/create` | Create the delete |
+
+
 
 ## Development Notes
 
 - **Environment**: Set `env=dev` for local development. Production mode (`env=prod`) enables Better Stack logging and OpenTelemetry instrumentation.
-- **Database port**: The Compose file maps host port `5439` to container port `5432`. Keep `db_port=5439` in `.env` when connecting from the host.
-- **Refresh token cookie**: In development, the refresh token cookie is set with `secure=False`. Use HTTPS and `secure=True` in production deployments.
+- **Database port**: The Compose file maps host port `5439` to container port `5432`. Keep `db_port=5439` in `.env` when connecting from the host. 
