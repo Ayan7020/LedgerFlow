@@ -25,3 +25,9 @@ class DealerService:
         await self.__session.commit()
 
         return None
+
+    @tracing("DealerService.getall")
+    async def get_all(self,user_id: UNIQUE_ID_TYPE) -> list[Dealers]:  
+
+        dealers = await self.__repo.get_all_by_user_id(user_id=user_id) 
+        return dealers
