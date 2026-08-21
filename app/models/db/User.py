@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .RefreshToken import RefreshToken
+    from .Dealers import Dealers
 
 
 class User(Base):
@@ -38,6 +39,11 @@ class User(Base):
     )
 
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship(
+        back_populates="user",
+        default_factory=list,
+    )
+
+    dealers: Mapped[list["Dealers"]] = relationship(
         back_populates="user",
         default_factory=list,
     )
